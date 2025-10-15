@@ -34,17 +34,22 @@ void expand_key_sse2(const char* key, size_t key_size, char* expanded_key, size_
         }
 
         if (i % 4 == 0) {
-            // Rotate using SSE2
+            // Rotate using SSE2 shuffle
             __m128i temp_vec = _mm_set_epi8(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                                             temp[3], temp[2], temp[1], temp[0]);
             __m128i rotated = _mm_shuffle_epi8(temp_vec,
                                                _mm_set_epi8(15, 14, 13, 12, 11, 10, 9, 8,
                                                            7, 6, 5, 4, 0, 3, 2, 1));
 
-            // Extract rotated bytes and perform S-box lookups
+            // Extract rotated bytes
+            temp[0] = (uint8_t)_mm_extract_epi8(rotated, 0);
+            temp[1] = (uint8_t)_mm_extract_epi8(rotated, 1);
+            temp[2] = (uint8_t)_mm_extract_epi8(rotated, 2);
+            temp[3] = (uint8_t)_mm_extract_epi8(rotated, 3);
+
+            // S-box lookups
             for (int j = 0; j < 4; j++) {
-                uint8_t byte_val = (uint8_t)_mm_extract_epi8(rotated, j);
-                temp[j] = sbox[byte_val];
+                temp[j] = sbox[temp[j]];
             }
 
             // Rcon
