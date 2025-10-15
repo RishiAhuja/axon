@@ -1,9 +1,10 @@
 #include "../../include/common/transformation_config.h"
 #include "../../include/common/config.h"
+#include "../../include/crypto/confusion_simd.h"
 #include <stdint.h>
 #include <stdio.h>
 
-void sub_bytes(char** state){
+void sub_bytes_original(char** state){
     for (int i = 0; i < STATE_SIZE; i++) {
         for (int j = 0; j < STATE_SIZE; j++) {
             state[i][j] = sbox[(unsigned char)state[i][j]];
@@ -11,7 +12,11 @@ void sub_bytes(char** state){
     }
 }
 
-void inv_sub_bytes(char** state){
+void sub_bytes(char** state){
+    sub_bytes_simd(state);
+}
+
+void inv_sub_bytes_original(char** state){
     for (int i = 0; i < STATE_SIZE; i++) {
         for (int j = 0; j < STATE_SIZE; j++) {
             state[i][j] = inv_sbox[(unsigned char)state[i][j]];
@@ -19,13 +24,21 @@ void inv_sub_bytes(char** state){
     }
 }
 
+void inv_sub_bytes(char** state){
+    inv_sub_bytes_simd(state);
+}
 
-void add_round_key(char** state, const uint8_t *round_key){
+
+void add_round_key_original(char** state, const uint8_t *round_key){
     for (int i = 0; i < STATE_SIZE; i++) {
         for (int j = 0; j < STATE_SIZE; j++) {
             state[i][j] ^= round_key[i * STATE_SIZE + j];
         }
     }
+}
+
+void add_round_key(char** state, const uint8_t *round_key){
+    add_round_key_simd(state, round_key);
 }
 
 void apply_rounds_keys(char** state, const uint8_t *expanded_key) {
