@@ -56,7 +56,7 @@ void mix_columns(char** state){
     mix_columns_simd(state);
 }
 
-void shift_rows(char** state){
+void shift_rows_original(char** state){
     char temp[STATE_SIZE][STATE_SIZE];
     for (int i = 0; i < STATE_SIZE; i++) {
         for (size_t j = 0; j < STATE_SIZE; j++){
@@ -96,8 +96,12 @@ void shift_rows(char** state){
     }
 }
 
+void shift_rows(char** state){
+    shift_rows_simd(state);
+}
 
-void inv_mix_columns(char** state) {
+
+void inv_mix_columns_original(char** state) {
     char temp[STATE_SIZE][STATE_SIZE];
     
     for (int i = 0; i < STATE_SIZE; i++) {
@@ -121,8 +125,12 @@ void inv_mix_columns(char** state) {
     }
 }
 
+void inv_mix_columns(char** state) {
+    inv_mix_columns_simd(state);
+}
 
-void inv_shift_rows(char** state) {
+
+void inv_shift_rows_original(char** state) {
     char temp[STATE_SIZE][STATE_SIZE];
     for (int i = 0; i < STATE_SIZE; i++) {
         for (size_t j = 0; j < STATE_SIZE; j++) {
@@ -159,4 +167,8 @@ void inv_shift_rows(char** state) {
             state[i][j] = temp[i][j];
         }
     }
+}
+
+void inv_shift_rows(char** state) {
+    inv_shift_rows_simd(state);
 }
