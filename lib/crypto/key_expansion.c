@@ -4,10 +4,11 @@
 #include "../../include/common/failures.h"
 #include "../../include/common/config.h"
 #include "../../include/crypto/key_expansion.h"
+#include "../../include/crypto/key_expansion_simd.h"
 #include <stdint.h>
 #include "../../include/common/transformation_config.h"
 
-void expand_key(const char* key, size_t key_size, char* expanded_key, size_t expanded_key_size)
+void expand_key_original(const char* key, size_t key_size, char* expanded_key, size_t expanded_key_size)
 {
     if (key_size != STATE_SIZE * STATE_SIZE) {
         fprintf(stderr, "Invalid key size\n");
@@ -47,6 +48,11 @@ void expand_key(const char* key, size_t key_size, char* expanded_key, size_t exp
         }
     }
 
+}
+
+void expand_key(const char* key, size_t key_size, char* expanded_key, size_t expanded_key_size)
+{
+    expand_key_simd(key, key_size, expanded_key, expanded_key_size);
 }
 
 
