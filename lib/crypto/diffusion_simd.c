@@ -3,6 +3,9 @@
 #include "../../include/common/optimization.h"
 #include <string.h>
 
+// Forward declare the original scalar implementation
+extern void mix_columns_original(char** state);
+
 static void (*optimal_mix_columns)(char** state) = NULL;
 
 #if defined(__SSE2__) || defined(_M_X64) || (defined(_M_IX86_FP) && _M_IX86_FP >= 2)
@@ -193,12 +196,19 @@ void mix_columns_avx2(char** state) {
 #endif // AVX2
 
 #else
+// Forward declare the original implementation
+extern void mix_columns_original(char** state);
+
 void mix_columns_sse2(char** state) {
-    mix_columns(state);
+    mix_columns_original(state);
+}
+
+void mix_columns_avx(char** state) {
+    mix_columns_original(state);
 }
 
 void mix_columns_avx2(char** state) {
-    mix_columns(state);
+    mix_columns_original(state);
 }
 #endif // SSE2
 
@@ -209,7 +219,7 @@ void init_diffusion_simd(void) {
     }
     
     optimal_mix_columns = get_optimal_implementation(
-        (void*)mix_columns,      
+        (void*)mix_columns_original,      
         (void*)mix_columns_sse2,  
         (void*)mix_columns_avx,                     
         (void*)mix_columns_avx2,  
